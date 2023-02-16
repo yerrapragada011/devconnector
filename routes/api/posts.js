@@ -110,7 +110,7 @@ router.put('/like/:id', auth, async (req, res) => {
 
     // Check if the post has already been liked
     if (
-      post.likes.filter((like) => like.user.toString() === req.user.id).legnth >
+      post.likes.filter((like) => like.user.toString() === req.user.id).length >
       0
     ) {
       return res.status(400).json({ msg: 'Post already liked' });
@@ -137,7 +137,7 @@ router.put('/unlike/:id', auth, async (req, res) => {
     // Check if the post has already been liked
     if (
       post.likes.filter((like) => like.user.toString() === req.user.id)
-        .legnth === 0
+        .length === 0
     ) {
       return res.status(400).json({ msg: 'Post has not yet been liked' });
     }
@@ -217,8 +217,8 @@ router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
 
     // Get remove index
     const removeIndex = post.comments
-    .map(comment => comment.user.toString())
-    .indexOf(req.user.id);
+      .map((comment) => comment.user.toString())
+      .indexOf(req.user.id);
 
     post.comments.splice(removeIndex, 1);
 
