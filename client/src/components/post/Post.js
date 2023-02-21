@@ -1,14 +1,14 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Spinner from '../layout/Spinner';
 import PostItem from '../posts/PostItem';
+import CommentForm from '../post/CommentForm';
+import CommentItem from '../post/CommentItem';
 import { getPost } from '../../actions/post';
-import CommentForm from './CommentForm';
-import CommentItem from './CommentItem';
 
-const Post = ({ getPost, post: { post, loading }, match }) => {
+const Post = ({ getPost, post: { post, loading } }) => {
   const { id } = useParams();
   useEffect(() => {
     getPost(id);
@@ -17,7 +17,7 @@ const Post = ({ getPost, post: { post, loading }, match }) => {
   return loading || post === null ? (
     <Spinner />
   ) : (
-    <Fragment>
+    <section className='container'>
       <Link to='/posts' className='btn'>
         Back To Posts
       </Link>
@@ -28,7 +28,7 @@ const Post = ({ getPost, post: { post, loading }, match }) => {
           <CommentItem key={comment._id} comment={comment} postId={post._id} />
         ))}
       </div>
-    </Fragment>
+    </section>
   );
 };
 

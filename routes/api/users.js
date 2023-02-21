@@ -1,26 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const gravatar = require('gravatar');
-const brcypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const { check, validationResult } = require('express-validator');
+const normalize = require('normalize-url');
 
 const User = require('../../models/User');
 
-// @route   GET api/users
-// @desc   Register user
+// @route    POST api/users
+// @desc     Register user
 // @access   Public
 router.post(
   '/',
-  [
-    check('name', 'Name is required').not().isEmpty(),
-    check('email', 'Please include a valid email').isEmail(),
-    check(
-      'password',
-      'Please enter a password with 6 or more characters'
-    ).isLength({ min: 6 }),
-  ],
+  check('name', 'Name is required').notEmpty(),
+  check('email', 'Please include a valid email').isEmail(),
+  check(
+    'password',
+    'Please enter a password with 6 or more characters'
+  ).isLength({ min: 6 }),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -38,11 +37,14 @@ router.post(
           .json({ errors: [{ msg: 'User already exists' }] });
       }
 
-      const avatar = gravatar.url(email, {
-        s: '200',
-        r: 'pg',
-        d: 'mm',
-      });
+      const avatar = normalize(
+        gravatar.url(email, {
+          s: '200',
+          r: 'pg',
+          d: 'mm',
+        }),
+        { forceHttps: true }
+      );
 
       user = new User({
         name,
@@ -51,9 +53,9 @@ router.post(
         password,
       });
 
-      const salt = await brcypt.genSalt(10);
+      const salt = await bcrypt.genSalt(10);
 
-      user.password = await brcypt.hash(password, salt);
+      user.password = await bcrypt.hash(password, salt);
 
       await user.save();
 
@@ -66,7 +68,7 @@ router.post(
       jwt.sign(
         payload,
         config.get('jwtSecret'),
-        { expiresIn: 3600 },
+        { expiresIn: '5 days' },
         (err, token) => {
           if (err) throw err;
           res.json({ token });
